@@ -12,3 +12,5 @@ airflow db init
 airflow users create --username admin --firstname admin\
     --lastname admin --role Admin --email x@gmail.com\
     --password admin
+
+airflow webserver
