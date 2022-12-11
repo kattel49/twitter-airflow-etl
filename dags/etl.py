@@ -19,22 +19,31 @@ api = tweepy.API(auth)
 #all public tweets
 #public_tweets = api.home_timeline()
 
-elon_tweets = api.user_timeline(screen_name="@elonmusk",
-                        # max is 200
-                        count=5,
-                        # include retweets
-                        include_rts=False,
-                        # keep full text
-                        tweet_mode="extended"
-                        )
+tweet_dict = {}
 
-for tweet in elon_tweets:
-    extracted_tweet = {
-        "user": tweet.user.screen_name,
-        "text": tweet._json["full_text"],
-        "favorite_count": tweet.favorite_count,
-        "retweet_count" : tweet.retweet_count,
-        'created_at' : tweet.created_at
-    }
+twitter_handle = ['@elonmusk', '@NASA', '@twitter', '@cnnbrk', '@jim_adler', '@mjcavaretta']
+twitter_sname = [x[1:] for x in twitter_handle]
 
-    print(extracted_tweet)
+for count, user in enumerate(twitter_handle):
+    raw_tweets = api.user_timeline(screen_name=user,
+                            # max is 200
+                            count=5,
+                            # include retweets
+                            include_rts=False,
+                            # keep full text
+                            tweet_mode="extended"
+                            )
+    
+    if tweet_dict.get(twitter_sname[count]) is None:
+        tweet_dict[twitter_sname[count]] = []
+
+    for tweet in raw_tweets:
+        extracted_tweet = {
+            "text": tweet._json["full_text"],
+            "favorite_count": tweet.favorite_count,
+            "retweet_count" : tweet.retweet_count,
+            'created_at' : tweet.created_at
+        }
+        tweet_dict[twitter_sname[count]].append(extracted_tweet)
+
+print(tweet_dict)
