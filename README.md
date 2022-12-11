@@ -13,4 +13,5 @@ airflow users create --username admin --firstname admin\
     --lastname admin --role Admin --email x@gmail.com\
     --password admin
 
-airflow webserver
+# create the app
+airflow standalone

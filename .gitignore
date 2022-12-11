@@ -3,3 +3,4 @@ venv/
 airflow*
 logs/
 webserver*
+__pycache__

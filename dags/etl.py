@@ -80,14 +80,15 @@ def extract_tweet(t_handle, t_sname):
         }
         tweet_dict[t_sname].append(extracted_tweet)
 
-threads = []
+def etl_pipeline():
+    threads = []
 
-for i, t_handle in enumerate(twitter_handle):
-    t = myThread(threadId=i, t_handle=t_handle, t_sname=twitter_sname[i])
-    t.start()
-    threads.append(t)
+    for i, t_handle in enumerate(twitter_handle):
+        t = myThread(threadId=i, t_handle=t_handle, t_sname=twitter_sname[i])
+        t.start()
+        threads.append(t)
 
-for t in threads:
-    t.join()
+    for t in threads:
+        t.join()
 
-print(tweet_dict)
+    print(tweet_dict)
