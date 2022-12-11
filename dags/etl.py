@@ -5,6 +5,9 @@ from datetime import datetime
 from dotenv import load_dotenv
 import os
 import threading
+from TwitterModel import Tweets, session
+from sqlalchemy import and_
+
 
 load_dotenv()
 
@@ -12,6 +15,7 @@ ACCESS_TOKEN=os.getenv("ACCESS_TOKEN")
 ACCESS_SECRET=os.getenv("ACCESS_SECRET")
 CONSUMER_KEY=os.getenv("CONSUMER_KEY")
 CONSUMER_SECRET=os.getenv("CONSUMER_SECRET")
+
 
 auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET ,ACCESS_TOKEN, ACCESS_SECRET)
 
@@ -76,7 +80,6 @@ def extract_tweet(t_handle, t_sname):
             "text": tweet._json["full_text"],
             "favorite_count": tweet.favorite_count,
             "retweet_count" : tweet.retweet_count,
-            'created_at' : tweet.created_at
         }
         tweet_dict[t_sname].append(extracted_tweet)
 
@@ -90,5 +93,22 @@ def etl_pipeline():
 
     for t in threads:
         t.join()
+    
+    # after all the tweets are extracted
 
-    print(tweet_dict)
+    for key, value in tweet_dict.items():
+        for tweet in value:
+            # check to see if the tweet exists
+            db_tweet = session.query(Tweets).filter(and_(Tweets.user==key, Tweets.text==tweet.get("text"))).first()
+            # if tweet does not exist save it to the database
+            if db_tweet is None:
+                extracted = Tweets(user=key, text=tweet.get("text"), favorite_count=tweet.get("favorite_count"), retweet_count=tweet.get("retweet_count"))
+                session.add(extracted)
+            else:
+            # update the tweet values if it is already in the database
+                db_tweet.retweet_count = tweet.get("retweet_count")
+                db_tweet.favorite_count = tweet.get("favorite_count")
+                session.add(db_tweet)
+            
+            session.commit()
+    session.close()

@@ -12,7 +12,7 @@ default_args = {
 with DAG(dag_id="twitter_pieline",
         description="Extracting tweets and storing them in a database",
         start_date=datetime(2022, 12, 11, 12),
-        schedule="*/20 * * * *"
+        schedule="*/10 * * * *"
         ) as dag:
     
     t1 = PythonOperator(
